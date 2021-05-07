@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1023269032690",
+    "project_id": "uploadstoragedemo-fbda1",
+    "storage_bucket": "uploadstoragedemo-fbda1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1023269032690:android:db3d732512ffee3711f66b",
+        "android_client_info": {
+          "package_name": "com.uploadstoragedemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1023269032690-06bsgfvbm6faru0t2n6j627d5errq6u6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uploadstoragedemo",
+            "certificate_hash": "05307f989d43335c0795612a788a410053bf0973"
+          }
+        },
+        {
+          "client_id": "1023269032690-3jei799sssoved3rau1bcql63g2knr9v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7FOHhvTgNdCiRr0rAmi-W59O2fgukHrI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1023269032690-3jei799sssoved3rau1bcql63g2knr9v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

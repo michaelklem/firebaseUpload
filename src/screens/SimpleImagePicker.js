@@ -20,6 +20,7 @@ export default function SimpleImagePicker() {
   // const [imageSource, setImageSource] = useState(null);
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadingError, setUploadingError] = useState(null);
   const [transferred, setTransferred] = useState(0);
   
   function selectImage() {
@@ -67,16 +68,29 @@ export default function SimpleImagePicker() {
         Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 10000
       );
     });
+
     try {
+      setUploadingError(false)
       await task;
     } catch (e) {
-      console.error(e);
+      console.error("xxx: " + e);
+      setUploadingError(true)
+
+      Alert.alert(
+        'Photo was not uploaded!',
+        `${e}`
+      );
     }
+    
     setUploading(false);
-    Alert.alert(
-      'Photo uploaded!',
-      'Your photo has been uploaded to Firebase Cloud Storage!'
-    );
+
+    if (! uploadingError) {
+      Alert.alert(
+        'Photo uploaded!',
+        'Your photo has been uploaded to Firebase Cloud Storage!'
+      );
+    }
+
     setImage(null);
   };
 

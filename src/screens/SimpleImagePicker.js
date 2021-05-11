@@ -21,77 +21,91 @@ export default function SimpleImagePicker() {
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadingError, setUploadingError] = useState(null);
+  const [uploadingErrorMsg, setUploadingErrorMsg] = useState('');
   const [transferred, setTransferred] = useState(0);
   
   function selectImage() {
-    let options = {
-      // mediaType: 'photo',
-      // includeBase64: false,
-      maxWidth: 2000,
-      maxHeight: 2000,
-      storageOptions: {
-        skipBackup: true,
-        path: 'images'
-      }
-    };
+    try {
+      let options = {
+        // mediaType: 'photo',
+        // includeBase64: false,
+        maxWidth: 2000,
+        maxHeight: 2000,
+        storageOptions: {
+          skipBackup: true,
+          path: 'images'
+        }
+      };
 
-    launchImageLibrary(options, response => {
-      console.log({ response });
+      launchImageLibrary(options, response => {
+        console.log({ response });
 
-      if (response.didCancel) {
-        console.log('User cancelled photo picker');
-        Alert.alert('You did not select any image');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        let source = { uri: response.uri };
-        console.log({ source });
-        setImage(source);
-      }
-    });
+        if (response.didCancel) {
+          console.log('User cancelled photo picker');
+          Alert.alert('You did not select any image');
+        } else if (response.error) {
+          console.log('ImagePicker Error: ', response.error);
+        } else if (response.customButton) {
+          console.log('User tapped custom button: ', response.customButton);
+        } else {
+          let source = { uri: response.uri };
+          console.log({ source });
+          setImage(source);
+        }
+      });
+    } catch (e) {
+      console.log('fffff ' + e)
+    }
+
   }
 
   const uploadImage = async () => {
     const { uri } = image;
     const filename = uri.substring(uri.lastIndexOf('/') + 1);
     const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+
     setUploading(true);
     setTransferred(0);
-    const task = storage()
-      .ref(filename)
-      .putFile(uploadUri);
-    // set progress state
-    task.on('state_changed', snapshot => {
-      setTransferred(
-        Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 10000
-      );
-    });
 
     try {
-      setUploadingError(false)
+
+      const task = storage()
+        .ref(filename)
+        .putFile(uploadUri);
+
+        task.on('state_changed', snapshot => {
+            // set progress state
+            setTransferred(
+              Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 10000
+            );
+          });
+
+        task.then(() => {
+          Alert.alert(
+            'Photo uploaded!',
+            'Your photo has been uploaded to Firebase Cloud Storage!'
+          );
+        });
+
+        task.catch(error =>{
+            console.log('Upload error: ' + error);
+            throw error;
+          })
+
+
       await task;
     } catch (e) {
-      console.error("xxx: " + e);
-      setUploadingError(true)
-
+      // console.error("xxx: " + e);
       Alert.alert(
         'Photo was not uploaded!',
         `${e}`
       );
     }
-    
-    setUploading(false);
-
-    if (! uploadingError) {
-      Alert.alert(
-        'Photo uploaded!',
-        'Your photo has been uploaded to Firebase Cloud Storage!'
-      );
+    finally{
+      console.log('finally');
+      setUploading(false);
+      setImage(null);      
     }
-
-    setImage(null);
   };
 
 
@@ -104,15 +118,18 @@ export default function SimpleImagePicker() {
         {image !== null ? (
           <Image source={{ uri: image.uri }} style={styles.imageBox} />
         ) : null}
+        
         {uploading ? (
           <View style={styles.progressBarContainer}>
             <Progress.Bar progress={transferred} width={300} />
           </View>
         ) : (
+          image &&
           <TouchableOpacity style={styles.uploadButton} onPress={uploadImage}>
             <Text style={styles.buttonText}>Upload image</Text>
           </TouchableOpacity>
         )}
+
       </View>
     </SafeAreaView>
   );
@@ -128,7 +145,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: 150,
     height: 50,
-    backgroundColor: '#8ac6d1',
+    backgroundColor: 'green',
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -136,7 +153,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: 150,
     height: 50,
-    backgroundColor: '#ffb6b9',
+    backgroundColor: 'blue',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20
